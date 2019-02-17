@@ -114,14 +114,17 @@ int main(int argc, const char * argv[]) {
     //-------Jerry's code
     //additional variables for our own purposes
 
-
+ 
     float myAngle;
     float myDistance;
     float expDistance;
 
-    float frontDistance;
-    float rightDistance;
-    float leftDistance;
+    float refArray[600][2]; //2D array, 570 elements, then 0-> angle, 1->distance
+    bool checked = false;//flag, if has reference array, then 1
+
+    // float frontDistance;
+    // float rightDistance;
+    // float leftDistance;
 
     //variables for changing dimension 
     float sidelength = 2150.0;
@@ -134,32 +137,42 @@ int main(int argc, const char * argv[]) {
     struct sockaddr_in address; 
     int sock = 0, valread; 
     struct sockaddr_in serv_addr; 
-     
+    
+    printf("debug 1, line 141\n");
     //string msg_str;
     char buffer[1024] = {0}; 
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
-    { 
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) { 
         printf("\n Socket creation error \n"); 
         return -1; 
     } 
-   
+
     memset(&serv_addr, '0', sizeof(serv_addr)); 
    
     serv_addr.sin_family = AF_INET; 
     serv_addr.sin_port = htons(PORT); 
-       
+    
+    printf("debug 1.2, line 154\n");
+
     // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
+    //137.146.126.135
+    if(inet_pton(AF_INET, "137.146.126.135", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
+    // if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
     } 
+
+    printf("debug 1.3, line 163\n");
+
    
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
     { 
+        printf("debug 1.4, line 163\n");
+
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
+    printf("debug 2, line 167\n");
 
 
     //----the end of Jerry's code
@@ -277,6 +290,7 @@ int main(int argc, const char * argv[]) {
     // start scan...
     drv->startScan(0,1);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // fetech result and print it out...
     //one revolution
     while (1) {
@@ -291,82 +305,100 @@ int main(int argc, const char * argv[]) {
 
             std::string msg_str = "";
 
+
             //Jerry's code
 
             /*  first, check flag, 
                 if false, 
                     then scan the scene and store the data in an 2D array
-                    turn flag into false
+                        array: approx 570 depth
+                    repeat three times and get an average, turn flag into false
                 second, check flag, 
                 if true, 
                     keep while() loop on scanning the scene
-                    check every angle,    
-                    
+                        check every angle, 
+                            compare reference array with current angle
+                            if distance changed
+                                record angle
+            check angle:
+                method 1: check array list index. cons: small deviation - within half a degree
+                method 2: average each angle. 0-180, find index, if distance not zero -> add and average
 
+                final -> method 1
             */
+            if(!checked){
+                printf("print reference array\n");
 
+                //loop and calculate average
+                for(int i=0; i<10; i++){
+                    // float refArray[700][2]; //2D array, 570 elements, then 0-> angle, 1->distance
+                    // build up reference array 
+                    for (int pos = 0; pos < (int)count ; ++pos) {
+                        refArray[pos][0] += (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f; // my angle
+                        refArray[pos][1] +=  nodes[pos].distance_q2/4.0f; // my distance 
+                    }
+                    //print the array in the first loop
+                    if(i==0){
+                        //average each node and print reference array
+                        for(int i=0; i<600; i++)    //This loops on the rows.
+                        {
+                            for(int j=0; j<2; j++) //This loops on the columns
+                            {
+                                printf("%f  ", refArray[i][j] );
+                            }
+                            printf("\n");
+                        }
+                    }
+                }
 
-            //660 
-            // 2 or 3 circles
+                //average each node and print reference array
+                for(int i=0; i<600; i++)    //This loops on the rows.
+                {
+                    for(int j=0; j<2; j++) //This loops on the columns
+                    {
+                        refArray[i][j] = refArray[i][j]/10;
+                        printf("%f  ", refArray[i][j] );
+                    }
+                    printf("\n");
+                }
+
+                
+                checked = true;
+            }
+             //660 
             for (int pos = 0; pos < (int)count ; ++pos) {
 
-		        myAngle = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f;
+                myAngle = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f;
                 myDistance = nodes[pos].distance_q2/4.0f;
 
-                // //front
-                // if(myAngle >= 0.0 && myAngle <= 90.0){
-                // 	frontDistance = sidelength/cos(myAngle * M_PI/180.0); //convert from angles to radians		
-                // }
-                // else if(myAngle >= 270.0 && myAngle <= 360.0){
-                //     frontDistance = sidelength/cos((360.0-myAngle) * M_PI/180.0);
-                // }
-                // else{ frontDistance = 999999;}
+                expDistance = refArray[pos][1];
 
-                // //right
-                // if(myAngle >= 0.0 && myAngle <= 90.0){
-                //     rightDistance = (shortsidelength)/cos((90.0 - myAngle) * M_PI/180.0);
-                // }
-                // else{ rightDistance = 999999;}
-
-                // //left
-                // if(myAngle >= 270 && myAngle <= 360.0){
-                // 	leftDistance = (shortsidelength)/cos((90.0-(360.0-myAngle))*M_PI/180.0);		
-                // }
-                // else{ leftDistance = 999999;}
-                
-                // //get smallest
-                // if( frontDistance < rightDistance){
-                //     expDistance = frontDistance;
-                // }
-                // else{ expDistance = rightDistance;}
-                // if( leftDistance < expDistance){ 
-                //     expDistance = leftDistance;
-                // }
-
-                //expDistance -> reference array
-
+                //compare the distance
                 if( (myAngle >= 0.0 && myAngle <= 85.0) || (myAngle >= 275 && myAngle <= 360)){
                               
-                	if( abs(expDistance - myDistance) > 250.0){ //mm threshold
-                	   // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
-                	   // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
-                	   // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
-                	   // printf("Front Distance %03.2f, left distance, %03.2f, right distance %03.2f \n", frontDistance, leftDistance, rightDistance);
-                       printf("--------------------------------\n"); 
+                    if( abs(expDistance - myDistance) > 500.0){ //mm threshold, abs stands for absolute threshold
+                       // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
+                       // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
+                       // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
+                       // printf("Front Distance %03.2f, left distance, %03.2f, right distance %03.2f \n", frontDistance, leftDistance, rightDistance);
+                       // printf("--------------------------------\n"); 
 
-                       msg_str += to_string(myAngle);
-                       msg_str += ",";
-                       msg_str += to_string(myDistance);
-                       msg_str += "\n";
-                    }               
+                        msg_str += to_string(myAngle);
+                        msg_str += ",";
+                        msg_str += to_string(myDistance);
+                        msg_str += "\n";
+                    }
 
-		        }
+                }
             }
+
 
             char msg[msg_str.length() + 1];
             strcpy(msg, msg_str.c_str());
             //array
             send(sock , msg , strlen(msg) , 0 ); 
+
+
 
         }
 
@@ -378,6 +410,7 @@ int main(int argc, const char * argv[]) {
     drv->stop();
     drv->stopMotor();
     // done!
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 on_finished:
     RPlidarDriver::DisposeDriver(drv);
     drv = NULL;
