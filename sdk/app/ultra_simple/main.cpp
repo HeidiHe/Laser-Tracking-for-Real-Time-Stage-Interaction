@@ -301,12 +301,10 @@ int main(int argc, const char * argv[]) {
 
         if (IS_OK(op_result)) {
             drv->ascendScanData(nodes, count);
-            printf("\n\nstarting scan\n\n=====\n");
+            // printf("\n\nstarting scan\n\n=====\n");
 
             std::string msg_str = "";
 
-
-            //Jerry's code
 
             /*  first, check flag, 
                 if false, 
@@ -326,6 +324,7 @@ int main(int argc, const char * argv[]) {
 
                 final -> method 1
             */
+            //check and build up reference array
             if(!checked){
                 printf("print reference array\n");
 
@@ -339,8 +338,22 @@ int main(int argc, const char * argv[]) {
                     }
                     //print the array in the first loop
                     if(i==0){
+                        printf("first round///////////////////////////////////////\n");
                         //average each node and print reference array
-                        for(int i=0; i<600; i++)    //This loops on the rows.
+                        for(int i=0; i<700; i++)    //This loops on the rows.
+                        {
+                            for(int j=0; j<2; j++) //This loops on the columns
+                            {
+                                printf("%f  ", refArray[i][j] );
+                            }
+                            printf("\n");
+                        }
+                    }
+
+                    if(i==1){
+                        printf("second round/////////////////////////////////////\n");
+                        //average each node and print reference array
+                        for(int i=0; i<700; i++)    //This loops on the rows.
                         {
                             for(int j=0; j<2; j++) //This loops on the columns
                             {
@@ -352,7 +365,8 @@ int main(int argc, const char * argv[]) {
                 }
 
                 //average each node and print reference array
-                for(int i=0; i<600; i++)    //This loops on the rows.
+                printf("final round/////////////////////////////////////\n");
+                for(int i=0; i<700; i++)    //This loops on the rows.
                 {
                     for(int j=0; j<2; j++) //This loops on the columns
                     {
@@ -365,6 +379,9 @@ int main(int argc, const char * argv[]) {
                 
                 checked = true;
             }
+
+            // printf("debug 3 checked\n");
+
              //660 
             for (int pos = 0; pos < (int)count ; ++pos) {
 
@@ -374,25 +391,29 @@ int main(int argc, const char * argv[]) {
                 expDistance = refArray[pos][1];
 
                 //compare the distance
-                if( (myAngle >= 0.0 && myAngle <= 85.0) || (myAngle >= 275 && myAngle <= 360)){
+                // if( (myAngle >= 0.0 && myAngle <= 175.0) || (myAngle >= 275 && myAngle <= 360)){
+                if(myAngle >= 0.0 && myAngle <= 175.0){
                               
-                    if( abs(expDistance - myDistance) > 500.0){ //mm threshold, abs stands for absolute threshold
+                    //mm threshold, abs stands for absolute threshold
+                    if( abs(expDistance - myDistance) > 500.0){ 
                        // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
                        // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
                        // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
                        // printf("Front Distance %03.2f, left distance, %03.2f, right distance %03.2f \n", frontDistance, leftDistance, rightDistance);
                        // printf("--------------------------------\n"); 
 
+
                         msg_str += to_string(myAngle);
                         msg_str += ",";
                         msg_str += to_string(myDistance);
-                        msg_str += "\n";
+                        msg_str += ",";
+                        // msg_str += "\n";
                     }
 
                 }
             }
 
-
+            // printf("sending data debug 4\n");
             char msg[msg_str.length() + 1];
             strcpy(msg, msg_str.c_str());
             //array
