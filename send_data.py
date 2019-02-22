@@ -8,6 +8,7 @@ import argparse
 import random
 import time
 import math
+import statistics
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -45,10 +46,10 @@ def groupData(arr):
     groupIndex = 0
     groupSize = []
     finalArr = [] # final array = [[x, y, groupSize], [x, y groupSize]]
-    print("length of rawData is " + str(len(arr)))
+    # print("length of rawData is " + str(len(arr)))
 
     maxgap = 5 # 5 degree maximum gap
-    print("maximum gap is " + str(maxgap))
+    # print("maximum gap is " + str(maxgap))
 
     #loop through rawData and seperate angle and distance
     for i in range(len(arr)):
@@ -56,42 +57,37 @@ def groupData(arr):
         if(i%2 == 0):
             x = float(arr[i])
             dist = float(arr[i+1])
-            print("angle, distance: %f %f " %(x, dist))
+            # print("angle, distance: %f %f " %(x, dist))
             #first angle, create new group
             if(i==0):
                 angleGroups = [[x]]
                 distanceGroups = [[dist]]
             else:
-                if abs(x - float(angleGroups[-1][-1]) )<= maxgap:
-                    angleGroups[-1].append(x)
-                    distanceGroups[-1].append(dist)
-                else:
-                    print("creating new group")
-                    angleGroups.append([x])
-                    distanceGroups.append([dist])
-        # # distance
-        # else:
-        #     if(i==1):
-        #         #first distance,create new group
-        #     else:
-        #         #detect gap & put into group
-        #         if abs(x - float(distanceGroups[-1][-1])) <= maxgap:
-        #         else:
-        #             print("creating new distanceGroups")
+                if(dist!=0):
+                    if abs(x - float(angleGroups[-1][-1]) )<= maxgap:
+                        angleGroups[-1].append(x)
+                        distanceGroups[-1].append(dist)
+                    else:
+                        # print("creating new group")
+                        angleGroups.append([x])
+                        distanceGroups.append([dist])
 
+    #get avg of each group
     for i in range(len(angleGroups)):
         eachAngleGroup = angleGroups[i]
-        eachDistanceGroup = distanceGroups[i]        
-        avgAngle = Average(eachAngleGroup)
-        avgDistance = Average(eachDistanceGroup)
+        eachDistanceGroup = distanceGroups[i]  
+        avgAngle = statistics.median(eachAngleGroup) #turn degree into radius     
+        avgDistance = statistics.median(eachDistanceGroup)
 
-        x = math.cos(avgAngle)*avgDistance
-        y = math.sin(avgAngle)*avgDistance
+        x = avgDistance * math.cos(math.radians(avgAngle))
+        y = avgDistance * math.sin(avgAngle)
         size = len(eachAngleGroup)
 
-        finalArr.append([x, y ,size])
-
-
+        if(size>2):
+            print("avgAngle, avgDistance: %f %f %f" % (avgAngle, avgDistance, size))
+            finalArr.append([x, y ,size])
+            print("found people!!!!")
+        
     return finalArr
 
 # Python program to get average of a list 
@@ -101,7 +97,15 @@ def Average(lst):
     # --> np.mean(l)
     # return groups
 
-
+        # # distance
+        # else:
+        #     if(i==1):
+        #         #first distance,create new group
+        #     else:
+        #         #detect gap & put into group
+        #         if abs(x - float(distanceGroups[-1][-1])) <= maxgap:
+        #         else:
+        #             print("creating new distanceGroups")
 
     #  #loop through rawData and seperate angle and distance
     # for i in range(len(arr)):
@@ -173,7 +177,7 @@ while True:
             # print("newData is " + strData)
             #group data and return an 2d array with poeple's position: x, y, size
             finalData = groupData(newData)
-            print("final data is" )
+            # print("final data is" )
             print(*finalData)
             # client.send_message("/x", newData[0])
             # client.send_message("/y", newData[1])
