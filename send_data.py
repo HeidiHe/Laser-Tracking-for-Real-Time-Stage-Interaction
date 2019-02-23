@@ -48,7 +48,7 @@ def groupData(arr):
     finalArr = [] # final array = [[x, y, groupSize], [x, y groupSize]]
     # print("length of rawData is " + str(len(arr)))
 
-    maxgap = 5 # 5 degree maximum gap
+    maxgap = 3 # 5 degree maximum gap
     # print("maximum gap is " + str(maxgap))
 
     #loop through rawData and seperate angle and distance
@@ -83,8 +83,12 @@ def groupData(arr):
         y = avgDistance * math.sin(avgAngle)
         size = len(eachAngleGroup)
 
-        if(size>2):
+        if(size>5):
             print("avgAngle, avgDistance: %f %f %f" % (avgAngle, avgDistance, size))
+            print("each angle group")
+            print(*eachAngleGroup)
+            print("each distance group")
+            print(*eachDistanceGroup)
             finalArr.append([x, y ,size])
             print("found people!!!!")
         
@@ -93,59 +97,6 @@ def groupData(arr):
 # Python program to get average of a list 
 def Average(lst): 
     return sum(lst) / len(lst)             
-
-    # --> np.mean(l)
-    # return groups
-
-        # # distance
-        # else:
-        #     if(i==1):
-        #         #first distance,create new group
-        #     else:
-        #         #detect gap & put into group
-        #         if abs(x - float(distanceGroups[-1][-1])) <= maxgap:
-        #         else:
-        #             print("creating new distanceGroups")
-
-    #  #loop through rawData and seperate angle and distance
-    # for i in range(len(arr)):
-    #     if(i%2 == 0):
-    #         angle.append(arr[i])
-    #         print("angle is " + arr[i])
-    #     else:
-    #         distance.append(arr[i])
-    #         print("distance is " + arr[i])
-    #     # client.send_message("/angle", newData[i])
-    #     # client.send_message("/distance", newData[i+1])
-
-    # #detect gap & put into group
-    # for i in range(len(angle)):
-    #     #if first detection, then add into array
-    #     if(i==0):
-    #         groupSize = 1
-    #         newList = [angle[i], distance[i], groupIndex, groupSize]
-    #     else:
-    #         curAngle = angle[i]
-    #         prevAngle = angle[i-1]
-    #         groupSize += 1 #increase group size by 1 if same group
-    #         #there is a gap
-    #         if((curAngle - prevAngle)>5):
-    #             groupIndex += 1
-    #             groupSize = 1
-    #         print("groupIndex, groupSize: " + groupIndex +", " + groupSize)
-    #         newList = [angle[i], distance[i], groupIndex, groupSize]
-    #     #append new list to newArr
-    #     newArr.append(newList)
-
-    # #merge group
-    # for curList in newArr:
-    #     temp = []
-    #     for i in range curList[-1]: #curList[-1] is groupSize
-    #         curList[0]
-
-
-    # x = math.cos(angle)*distance
-    # y = math.sin(angle)*distance
 
 
 # client = udp_client.SimpleUDPClient("137.146.123.51", 8080)
@@ -177,7 +128,7 @@ while True:
             # print("newData is " + strData)
             #group data and return an 2d array with poeple's position: x, y, size
             finalData = groupData(newData)
-            # print("final data is" )
+            print("final data is" )
             print(*finalData)
             # client.send_message("/x", newData[0])
             # client.send_message("/y", newData[1])

@@ -334,12 +334,15 @@ int main(int argc, const char * argv[]) {
                 // build up reference array 
                 for (int pos = 0; pos < (int)count ; ++pos) {
                     float curA = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f; // my angle
-                    if(abs(curA)>360 && pos>0){
+                    if(fabs(curA)>360 && pos>0){
                         curA = refArray[pos-1][0];
+                        printf("angle data out of boundadry\n");
                     }
                     float curD = nodes[pos].distance_q2/4.0f; // my distance 
                     if(curD > 12000 && pos>0){
                         curD = refArray[pos-1][1];
+                        curA = refArray[pos-1][0];
+                        printf("distance data out of boundadry\n");
                     }
                     refArray[pos][0] += curA;
                     refArray[pos][1] += curD;
@@ -358,14 +361,14 @@ int main(int argc, const char * argv[]) {
                     }
                 }
 
-                if(checkcounter == 100){
+                if(checkcounter == 200){
                     //average each node and print reference array
                     printf("final round/////////////////////////////////////\n");
                     for(int i=0; i<700; i++)    //This loops on the rows.
                     {
                         for(int j=0; j<2; j++) //This loops on the columns
                         {
-                            refArray[i][j] = refArray[i][j]/100;
+                            refArray[i][j] = refArray[i][j]/200;
                             printf("%f  ", refArray[i][j] );
                         }
                         printf("\n");
@@ -384,11 +387,13 @@ int main(int argc, const char * argv[]) {
 
                     myAngle = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f; // my angle
                     if(abs(myAngle)>360){
+                        printf("anlge out of boundary\n");
                         myAngle = refArray[pos][0];
                     }
                     myDistance = nodes[pos].distance_q2/4.0f; // my distance 
                     if(myDistance > 12000){
                         myDistance = refArray[pos][1];
+                        myAngle = refArray[pos][0];
                     }
 
                     // myAngle = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f;
@@ -401,7 +406,7 @@ int main(int argc, const char * argv[]) {
                     if(myAngle >= 5.0 && myAngle <= 175.0){
                                   
                         //mm threshold, abs stands for absolute threshold
-                        if( abs(expDistance - myDistance) > 5000.0){ 
+                        if( fabs(expDistance - myDistance) > 3000.0){ 
                            // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
                            // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
                            // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
