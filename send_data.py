@@ -48,49 +48,54 @@ def groupData(arr):
     finalArr = [] # final array = [[x, y, groupSize], [x, y groupSize]]
     # print("length of rawData is " + str(len(arr)))
 
-    maxgap = 3 # 5 degree maximum gap
+    maxgap = 4 # 4 degree maximum gap
+    detected = False
     # print("maximum gap is " + str(maxgap))
 
-    #loop through rawData and seperate angle and distance
-    for i in range(len(arr)):
-        # angle
-        if(i%2 == 0):
-            x = float(arr[i])
-            dist = float(arr[i+1])
-            # print("angle, distance: %f %f " %(x, dist))
-            #first angle, create new group
-            if(i==0):
-                angleGroups = [[x]]
-                distanceGroups = [[dist]]
-            else:
-                if(dist!=0):
-                    if abs(x - float(angleGroups[-1][-1]) )<= maxgap:
-                        angleGroups[-1].append(x)
-                        distanceGroups[-1].append(dist)
+    if(len(arr)>0):
+        detected = True
+        #loop through rawData and seperate angle and distance
+        for i in range(len(arr)):
+            # angle
+            if(i%2 == 0):
+                if((i+1)<len(arr)):
+                    x = float(arr[i])
+                    dist = float(arr[i+1])
+                    # print("angle, distance: %f %f " %(x, dist))
+                    #first angle, create new group
+                    if(i==0):
+                        angleGroups = [[x]]
+                        distanceGroups = [[dist]]
                     else:
-                        # print("creating new group")
-                        angleGroups.append([x])
-                        distanceGroups.append([dist])
+                        if(dist!=0):
+                            if abs(x - float(angleGroups[-1][-1]) )<= maxgap:
+                                angleGroups[-1].append(x)
+                                distanceGroups[-1].append(dist)
+                            else:
+                                # print("creating new group")
+                                angleGroups.append([x])
+                                distanceGroups.append([dist])
 
-    #get avg of each group
-    for i in range(len(angleGroups)):
-        eachAngleGroup = angleGroups[i]
-        eachDistanceGroup = distanceGroups[i]  
-        avgAngle = statistics.median(eachAngleGroup) #turn degree into radius     
-        avgDistance = statistics.median(eachDistanceGroup)
+    if(detected):                            
+        #get avg of each group
+        for i in range(len(angleGroups)):
+            eachAngleGroup = angleGroups[i]
+            eachDistanceGroup = distanceGroups[i]  
+            avgAngle = statistics.median(eachAngleGroup) #turn degree into radius     
+            avgDistance = statistics.median(eachDistanceGroup)
 
-        x = avgDistance * math.cos(math.radians(avgAngle))
-        y = avgDistance * math.sin(avgAngle)
-        size = len(eachAngleGroup)
+            x = avgDistance * math.cos(math.radians(avgAngle))
+            y = avgDistance * math.sin(avgAngle)
+            size = len(eachAngleGroup)
 
-        if(size>5):
-            print("avgAngle, avgDistance: %f %f %f" % (avgAngle, avgDistance, size))
-            print("each angle group")
-            print(*eachAngleGroup)
-            print("each distance group")
-            print(*eachDistanceGroup)
-            finalArr.append([x, y ,size])
-            print("found people!!!!")
+            if(size>7):
+                print("avgAngle, avgDistance: %f %f %f" % (avgAngle, avgDistance, size))
+                # print("each angle group")
+                # print(*eachAngleGroup)
+                # print("each distance group")
+                # print(*eachDistanceGroup)
+                finalArr.append([x, y ,size])
+                print("found people!!!!")
         
     return finalArr
 
