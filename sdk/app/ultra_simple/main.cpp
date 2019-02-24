@@ -339,6 +339,9 @@ int main(int argc, const char * argv[]) {
                         printf("angle data out of boundadry\n");
                     }
                     float curD = nodes[pos].distance_q2/4.0f; // my distance 
+                    if(curD > 6000){
+                        curD = 0;
+                    }
                     if(curD > 12000 && pos>0){
                         curD = refArray[pos-1][1];
                         curA = refArray[pos-1][0];
@@ -391,6 +394,9 @@ int main(int argc, const char * argv[]) {
                         myAngle = refArray[pos][0];
                     }
                     myDistance = nodes[pos].distance_q2/4.0f; // my distance 
+                    if(myDistance > 6000){
+                        myDistance = 0;
+                    }
                     if(myDistance > 12000){
                         myDistance = refArray[pos][1];
                         myAngle = refArray[pos][0];
@@ -406,7 +412,7 @@ int main(int argc, const char * argv[]) {
                     if(myAngle >= 5.0 && myAngle <= 175.0){
                                   
                         //mm threshold, abs stands for absolute threshold
-                        if( fabs(expDistance - myDistance) > 3000.0){ 
+                        if( fabs(expDistance - myDistance) > 1500.0){ 
                            // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
                            // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
                            // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
