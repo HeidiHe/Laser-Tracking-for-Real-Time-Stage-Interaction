@@ -45,7 +45,7 @@ def groupData(arr):
     newArr = [] # newArr = [[angle1, distance1, group0],[angle2, distance2, group0]]
     groupIndex = 0
     groupSize = []
-    finalArr = [] # final array = [[x, y, groupSize], [x, y groupSize]]
+    finalArr = [[],[],[]] # final array = [[x, y, groupSize], [x, y groupSize]]
     # print("length of rawData is " + str(len(arr)))
 
     maxgap = 4 # 4 degree maximum gap
@@ -53,12 +53,13 @@ def groupData(arr):
     # print("maximum gap is " + str(maxgap))
 
     if(len(arr)>0):
-        detected = True
         #loop through rawData and seperate angle and distance
         for i in range(len(arr)):
             # angle
             if(i%2 == 0):
                 if((i+1)<len(arr)):
+                    detected = True
+                    
                     x = float(arr[i])
                     dist = float(arr[i+1])
                     # print("angle, distance: %f %f " %(x, dist))
@@ -85,7 +86,7 @@ def groupData(arr):
             avgDistance = statistics.median(eachDistanceGroup)
 
             x = avgDistance * math.cos(math.radians(avgAngle))
-            y = avgDistance * math.sin(avgAngle)
+            y = avgDistance * math.sin(math.radians(avgAngle))
             size = len(eachAngleGroup)
 
             if(size>7):
@@ -94,7 +95,11 @@ def groupData(arr):
                 # print(*eachAngleGroup)
                 # print("each distance group")
                 # print(*eachDistanceGroup)
-                finalArr.append([x, y ,size])
+                finalArr[0].append(x)
+                finalArr[1].append(y)
+                finalArr[2].append(size)
+                # finalArr.append([x, y ,size])
+                # finalArr.append([x, y ,size])
                 print("found people!!!!")
         
     return finalArr
@@ -104,13 +109,15 @@ def Average(lst):
     return sum(lst) / len(lst)             
 
 
-# client = udp_client.SimpleUDPClient("137.146.123.51", 8080)
+client = udp_client.SimpleUDPClient("192.168.8.231", 9996)
 # client2 = udp_client.SimpleUDPClient("192.168.8.106", 9999)
 
 s = socket.socket()
 host = socket.gethostname()
 port = 7777
-s.bind(('137.146.126.135',port))
+s.bind(('192.168.8.169',port))
+# s.bind(('137.146.126.135',port))
+
 s.listen(5)
 while True:
     # print("sending osc loop 1")
@@ -135,8 +142,9 @@ while True:
             finalData = groupData(newData)
             print("final data is" )
             print(*finalData)
-            # client.send_message("/x", newData[0])
-            # client.send_message("/y", newData[1])
+            client.send_message("/x", finalData[0])
+            client.send_message("/y", finalData[1])
+            client.send_message("/size", finalData[2])
 
             # up to six people
             # 2D array people[6][2]
@@ -151,4 +159,5 @@ while True:
 
 
 
+#192,168,8,231
 

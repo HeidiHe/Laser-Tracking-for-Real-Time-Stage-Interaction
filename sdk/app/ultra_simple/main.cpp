@@ -157,7 +157,8 @@ int main(int argc, const char * argv[]) {
 
     // Convert IPv4 and IPv6 addresses from text to binary form 
     //137.146.126.135
-    if(inet_pton(AF_INET, "137.146.126.135", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
+    //192.168.8.169
+    if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
     // if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
     { 
         printf("\nInvalid address/ Address not supported \n"); 
@@ -347,8 +348,10 @@ int main(int argc, const char * argv[]) {
                         curA = refArray[pos-1][0];
                         printf("distance data out of boundadry\n");
                     }
-                    refArray[pos][0] += curA;
-                    refArray[pos][1] += curD;
+                    // refArray[pos][0] += curA;
+                    // refArray[pos][1] += curD;
+                    refArray[pos][0] += 0;
+                    refArray[pos][1] += 0;
                 }
                 //print the array in the first loop
                 if(checkcounter==1){
@@ -364,21 +367,21 @@ int main(int argc, const char * argv[]) {
                     }
                 }
 
-                if(checkcounter == 200){
-                    //average each node and print reference array
-                    printf("final round/////////////////////////////////////\n");
-                    for(int i=0; i<700; i++)    //This loops on the rows.
-                    {
-                        for(int j=0; j<2; j++) //This loops on the columns
-                        {
-                            refArray[i][j] = refArray[i][j]/200;
-                            printf("%f  ", refArray[i][j] );
-                        }
-                        printf("\n");
-                    }
+                // if(checkcounter == 20){
+                //     //average each node and print reference array
+                //     printf("final round/////////////////////////////////////\n");
+                //     for(int i=0; i<700; i++)    //This loops on the rows.
+                //     {
+                //         for(int j=0; j<2; j++) //This loops on the columns
+                //         {
+                //             refArray[i][j] = refArray[i][j]/20;
+                //             printf("%f  ", refArray[i][j] );
+                //         }
+                //         printf("\n");
+                //     }
                     checked = true;
-                    printf("finished reference Arr\n\n");
-                }
+                //     printf("finished reference Arr\n\n");
+                // }
  
                 
             }
