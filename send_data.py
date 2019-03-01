@@ -21,19 +21,19 @@ import socket
 #     check angle ranges, merge closer ones
 
 #     build up an array rawData
-#     loop through the array and detect gap: 
-#         if prev is 3 degree smaller than cur, then there is a gap, then 
+#     loop through the array and detect gap:
+#         if prev is 3 degree smaller than cur, then there is a gap, then
 #         update variable 3; variable 3 is group number
 
-#         if x is larger than 6, 
+#         if x is larger than 6,
 #         then divide the gap again with a larger degree gap
-    
+
 #     build up a new array -> finalData[x][3]
 #     for each group:
 #         [0] average the distance
 #         [1] average the angle
 #         [2] get group size (lastAngle - firstAngle)
-    
+
 #     from angle calculate x,y distance -> x = abs(distance*cosA); y = abs(distance*sinA)
 
 # */
@@ -58,10 +58,16 @@ def groupData(arr):
             # angle
             if(i%2 == 0):
                 if((i+1)<len(arr)):
-                    detected = True
-                    
-                    x = float(arr[i])
-                    dist = float(arr[i+1])
+
+
+                    try:
+                        x = float(arr[i])
+                        dist = float(arr[i+1])
+                        detected = True
+                    except Exception as e:
+                        print ('index {%d} is corrupt!', i)
+                        break
+
                     # print("angle, distance: %f %f " %(x, dist))
                     #first angle, create new group
                     if(i==0):
@@ -77,16 +83,16 @@ def groupData(arr):
                                 angleGroups.append([x])
                                 distanceGroups.append([dist])
 
-    if(detected):                            
+    if(detected):
         #get avg of each group
         for i in range(len(angleGroups)):
             eachAngleGroup = angleGroups[i]
-            eachDistanceGroup = distanceGroups[i]  
-            avgAngle = statistics.median(eachAngleGroup) #turn degree into radius     
+            eachDistanceGroup = distanceGroups[i]
+            avgAngle = statistics.median(eachAngleGroup) #turn degree into radius
             avgDistance = statistics.median(eachDistanceGroup)
 
-            x = avgDistance * math.cos(math.radians(avgAngle))
-            y = avgDistance * math.sin(math.radians(avgAngle))
+            x = round( avgDistance * math.cos(math.radians(avgAngle)), 1)
+            y = round( avgDistance * math.sin(math.radians(avgAngle)), 1)
             size = len(eachAngleGroup)
 
             if(size>7):
@@ -101,15 +107,17 @@ def groupData(arr):
                 # finalArr.append([x, y ,size])
                 # finalArr.append([x, y ,size])
                 print("found people!!!!")
-        
+
     return finalArr
 
-# Python program to get average of a list 
-def Average(lst): 
-    return sum(lst) / len(lst)             
+# Python program to get average of a list
+def Average(lst):
+    return sum(lst) / len(lst)
 
 
-client = udp_client.SimpleUDPClient("192.168.8.231", 9996)
+client = udp_client.SimpleUDPClient("192.168.8.231", 9996)#heidi's macbook
+# client = udp_client.SimpleUDPClient("192.168.8.231", 9996)#heidi's macbook
+
 # client2 = udp_client.SimpleUDPClient("192.168.8.106", 9999)
 
 s = socket.socket()
@@ -123,7 +131,7 @@ while True:
     # print("sending osc loop 1")
     c, addr = s.accept()
     print("Connection accepted from " + repr(addr[1]))
-    
+
     while True:
         # print("rendering osc loop 2")
         data = c.recv(1026).decode("utf-8")
@@ -160,4 +168,3 @@ while True:
 
 
 #192,168,8,231
-

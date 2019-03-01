@@ -26,13 +26,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cmath> 
+#include <cmath>
 
 //includes for udp
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h> 
-#include <string> 
+#include <arpa/inet.h>
+#include <string>
 #include <iostream>
 #include <cstring>
 #define PORT 7777 //IMPORTANT
@@ -81,7 +81,7 @@ bool checkRPLIDARHealth(RPlidarDriver * drv)
 
     op_result = drv->getHealth(healthinfo);
     if (IS_OK(op_result)) { // the macro IS_OK is the preperred way to judge whether the operation is succeed.
-        printf("Staring Heidi's version 1\n"); 
+        printf("Staring Heidi's version 1\n");
         printf("RPLidar health status : %d\n", healthinfo.status);
         if (healthinfo.status == RPLIDAR_STATUS_ERROR) {
             fprintf(stderr, "Error, rplidar internal error detected. Please reboot the device to retry.\n");
@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
     //-------Jerry's code
     //additional variables for our own purposes
 
- 
+
     float myAngle;
     float myDistance;
     float expDistance;
@@ -128,7 +128,7 @@ int main(int argc, const char * argv[]) {
     // float rightDistance;
     // float leftDistance;
 
-    //variables for changing dimension 
+    //variables for changing dimension
     float sidelength = 2150.0;
     float shortsidelength = 1200;
 
@@ -136,45 +136,46 @@ int main(int argc, const char * argv[]) {
     //UDP code initialization
 
 
-    struct sockaddr_in address; 
-    int sock = 0, valread; 
-    struct sockaddr_in serv_addr; 
-    
+    struct sockaddr_in address;
+    int sock = 0, valread;
+    struct sockaddr_in serv_addr;
+
     printf("debug 1, line 141\n");
     //string msg_str;
-    char buffer[1024] = {0}; 
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) { 
-        printf("\n Socket creation error \n"); 
-        return -1; 
-    } 
+    char buffer[1024] = {0};
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
 
-    memset(&serv_addr, '0', sizeof(serv_addr)); 
-   
-    serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(PORT); 
-    
+    memset(&serv_addr, '0', sizeof(serv_addr));
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+
     printf("debug 1.2, line 154\n");
 
-    // Convert IPv4 and IPv6 addresses from text to binary form 
-    //137.146.126.135
-    //192.168.8.169
-    if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
-    // if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost 
-    { 
-        printf("\nInvalid address/ Address not supported \n"); 
-        return -1; 
-    } 
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    //137.146.126.135 heidi's macbook with Colby Wifi
+    //192.168.8.169 Heidi's macbook with the router
+    if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //Heidi's macbook
+    // if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //Heidi's macbook
+    // if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost
+    {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
 
     printf("debug 1.3, line 163\n");
 
-   
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
-    { 
+
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
         printf("debug 1.4, line 163\n");
 
-        printf("\nConnection Failed \n"); 
-        return -1; 
-    } 
+        printf("\nConnection Failed \n");
+        return -1;
+    }
     printf("debug 2, line 167\n");
 
 
@@ -189,7 +190,7 @@ int main(int argc, const char * argv[]) {
 
 
     // read serial port from the command line...
-    if (argc>1) opt_com_path = argv[1]; // or set to a fixed value: e.g. "com3" 
+    if (argc>1) opt_com_path = argv[1]; // or set to a fixed value: e.g. "com3"
 
     // read baud rate from the command line if specified...
     if (argc>2)
@@ -213,7 +214,7 @@ int main(int argc, const char * argv[]) {
         fprintf(stderr, "insufficent memory, exit\n");
         exit(-2);
     }
-    
+
     rplidar_response_device_info_t devinfo;
     bool connectSuccess = false;
     // make connection...
@@ -225,7 +226,7 @@ int main(int argc, const char * argv[]) {
         {
             op_result = drv->getDeviceInfo(devinfo);
 
-            if (IS_OK(op_result)) 
+            if (IS_OK(op_result))
             {
                 connectSuccess = true;
             }
@@ -247,7 +248,7 @@ int main(int argc, const char * argv[]) {
             {
                 op_result = drv->getDeviceInfo(devinfo);
 
-                if (IS_OK(op_result)) 
+                if (IS_OK(op_result))
                 {
                     connectSuccess = true;
                     break;
@@ -261,7 +262,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     if (!connectSuccess) {
-        
+
         fprintf(stderr, "Error, cannot bind to the specified serial port %s.\n"
             , opt_com_path);
         goto on_finished;
@@ -288,7 +289,7 @@ int main(int argc, const char * argv[]) {
     }
 
     signal(SIGINT, ctrlc);
-    
+
     drv->startMotor();
     // start scan...
     drv->startScan(0,1);
@@ -309,15 +310,15 @@ int main(int argc, const char * argv[]) {
             std::string msg_str = "";
 
 
-            /*  first, check flag, 
-                if false, 
+            /*  first, check flag,
+                if false,
                     then scan the scene and store the data in an 2D array
                         array: approx 570 depth
                     repeat three times and get an average, turn flag into false
-                second, check flag, 
-                if true, 
+                second, check flag,
+                if true,
                     keep while() loop on scanning the scene
-                        check every angle, 
+                        check every angle,
                             compare reference array with current angle
                             if distance changed
                                 record angle
@@ -332,14 +333,14 @@ int main(int argc, const char * argv[]) {
                 checkcounter++;
                 //loop and calculate average
                 // float refArray[700][2]; //2D array, 570 elements, then 0-> angle, 1->distance
-                // build up reference array 
+                // build up reference array
                 for (int pos = 0; pos < (int)count ; ++pos) {
                     float curA = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f; // my angle
                     if(fabs(curA)>360 && pos>0){
                         curA = refArray[pos-1][0];
                         printf("angle data out of boundadry\n");
                     }
-                    float curD = nodes[pos].distance_q2/4.0f; // my distance 
+                    float curD = nodes[pos].distance_q2/4.0f; // my distance
                     if(curD > 6000){
                         curD = 0;
                     }
@@ -382,13 +383,13 @@ int main(int argc, const char * argv[]) {
                     checked = true;
                 //     printf("finished reference Arr\n\n");
                 // }
- 
-                
+
+
             }
 
             else{
 
-                 //660 
+                 //660
                 for (int pos = 0; pos < (int)count ; ++pos) {
 
                     myAngle = (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f; // my angle
@@ -396,7 +397,7 @@ int main(int argc, const char * argv[]) {
                         printf("anlge out of boundary\n");
                         myAngle = refArray[pos][0];
                     }
-                    myDistance = nodes[pos].distance_q2/4.0f; // my distance 
+                    myDistance = nodes[pos].distance_q2/4.0f; // my distance
                     if(myDistance > 6000){
                         myDistance = 0;
                     }
@@ -413,14 +414,14 @@ int main(int argc, const char * argv[]) {
                     //compare the distance
                     // if( (myAngle >= 0.0 && myAngle <= 175.0) || (myAngle >= 275 && myAngle <= 360)){
                     if(myAngle >= 5.0 && myAngle <= 175.0){
-                                  
+
                         //mm threshold, abs stands for absolute threshold
-                        if( fabs(expDistance - myDistance) > 1500.0){ 
+                        if( fabs(expDistance - myDistance) > 1500.0){
                            // printf("object detected at angle %03.2f and distance %f\n", myAngle, myDistance);
                            // printf("expected distance at angle %03.2f is %f mm\n", myAngle, expDistance);
                            // printf("actual distance at angle %03.2f is %f mm\n", myAngle, myDistance);
                            // printf("Front Distance %03.2f, left distance, %03.2f, right distance %03.2f \n", frontDistance, leftDistance, rightDistance);
-                           // printf("--------------------------------\n"); 
+                           // printf("--------------------------------\n");
 
 
                             msg_str += to_string(myAngle);
@@ -437,15 +438,15 @@ int main(int argc, const char * argv[]) {
                 char msg[msg_str.length() + 1];
                 strcpy(msg, msg_str.c_str());
                 //array
-                send(sock , msg , strlen(msg) , 0 ); 
+                send(sock , msg , strlen(msg) , 0 );
             }
-            
+
 
 
 
         }
 
-        if (ctrl_c_pressed){ 
+        if (ctrl_c_pressed){
             break;
         }
     }
@@ -459,4 +460,3 @@ on_finished:
     drv = NULL;
     return 0;
 }
-
