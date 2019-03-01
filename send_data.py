@@ -2,6 +2,11 @@
 
 This program sends 10 random values between 0.0 and 1.0 to the /filter address,
 waiting for 1 seconds between each value.
+
+
+
+
+/dev/tty.SLAB_USBtoUART
 """
 
 import argparse
@@ -115,7 +120,7 @@ def Average(lst):
     return sum(lst) / len(lst)
 
 
-client = udp_client.SimpleUDPClient("192.168.8.231", 9996)#heidi's macbook
+client = udp_client.SimpleUDPClient("192.168.8.231", 9996)# Music Mac port
 # client = udp_client.SimpleUDPClient("192.168.8.231", 9996)#heidi's macbook
 
 # client2 = udp_client.SimpleUDPClient("192.168.8.106", 9999)
@@ -123,7 +128,7 @@ client = udp_client.SimpleUDPClient("192.168.8.231", 9996)#heidi's macbook
 s = socket.socket()
 host = socket.gethostname()
 port = 7777
-s.bind(('192.168.8.169',port))
+s.bind(('192.168.8.231',port)) # Music Mac 
 # s.bind(('137.146.126.135',port))
 
 s.listen(5)

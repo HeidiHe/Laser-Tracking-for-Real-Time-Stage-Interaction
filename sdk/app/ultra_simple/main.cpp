@@ -22,6 +22,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+
+
+ * To compile: make
+ * To run: /Users/studio2/Desktop/WorkingLaserCopy/sdk/output/Darwin/Release/ultra_simple /dev/tty.SLAB_USBtoUART
  */
 
 #include <stdio.h>
@@ -158,7 +162,8 @@ int main(int argc, const char * argv[]) {
     // Convert IPv4 and IPv6 addresses from text to binary form
     //137.146.126.135 heidi's macbook with Colby Wifi
     //192.168.8.169 Heidi's macbook with the router
-    if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //Heidi's macbook
+    //192.168.8.231. Music Mac with the router
+    if(inet_pton(AF_INET, "192.168.8.231", &serv_addr.sin_addr)<=0) //Music mac
     // if(inet_pton(AF_INET, "192.168.8.169", &serv_addr.sin_addr)<=0) //Heidi's macbook
     // if(inet_pton(AF_INET, "192.168.8.101", &serv_addr.sin_addr)<=0) //IP address -> change to localhost
     {
